@@ -53,42 +53,7 @@ class ProductController extends Controller
         return view('products.create', compact('categories', 'suppliers'));
     }
 
-    /**
-     * Store a newly created product in storage.
-     */
-        public function store(ProductStoreRequest $request)
-    {
-        $validated = $request->validated();
 
-        // Handle image upload
-        if ($request->hasFile('product_image')) {
-            $path = $request->file('product_image')->store('products', 'public');
-            $validated['product_image'] = $path;
-        }
-
-        // Separate product and inventory data
-        $productData = Arr::except($validated, ['quantity', 'minimum_stock_alert', 'unit_type']);
-        $inventoryData = Arr::only($validated, ['quantity', 'minimum_stock_alert', 'unit_type']);
-
-        // Create product
-        $product = Product::create($productData);
-
-        // Create inventory record
-        $product->inventory()->create([
-            'quantity'            => $inventoryData['quantity'],
-            'minimum_stock_alert' => $inventoryData['minimum_stock_alert'] ?? 5,
-            'unit_type'           => $inventoryData['unit_type'],
-        ]);
-
-        // Redirect based on button
-        if ($request->input('action') === 'save_and_new') {
-            return redirect()->route('products.create')
-                ->with('success', 'Product created successfully. Create another one.');
-        }
-
-        return redirect()->route('products.index')
-            ->with('success', 'Product created successfully.');
-    }
     public function edit(Product $product)
     {
         $product->load('inventory');

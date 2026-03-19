@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\POSController;
+
 
 Route::resource('products', ProductController::class);
 Route::resource('categories', CategoryController::class)->except(['show']);
@@ -27,4 +29,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
+    Route::get('/pos/search', [POSController::class, 'search'])->name('pos.search');
+    Route::post('/pos/order', [POSController::class, 'store'])->name('pos.store');
+    Route::get('/pos/invoice/{order}', [POSController::class, 'invoice'])->name('pos.invoice');
+});
 require __DIR__.'/auth.php';
