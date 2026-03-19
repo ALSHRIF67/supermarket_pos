@@ -28,11 +28,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 Route::middleware(['auth'])->group(function () {
-    Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
-    Route::get('/pos/search', [POSController::class, 'search'])->name('pos.search');
-    Route::post('/pos/order', [POSController::class, 'store'])->name('pos.store');
-    Route::get('/pos/invoice/{order}', [POSController::class, 'invoice'])->name('pos.invoice');
+    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::get('/pos/create', [PosController::class, 'create'])->name('pos.create');
+    Route::get('/pos/search', [PosController::class, 'search'])->name('pos.search');
+    Route::post('/pos/order', [PosController::class, 'store'])->name('pos.store');
+    Route::get('/pos/invoice/{order}', [PosController::class, 'invoice'])->name('pos.invoice');
 });
 require __DIR__.'/auth.php';

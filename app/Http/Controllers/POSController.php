@@ -11,10 +11,17 @@ use App\Http\Requests\StoreOrderRequest;
 
 class PosController extends Controller
 {
-    public function index()
+
+public function index()
+{
+    // مثال: عرض آخر 10 طلبات
+    $orders = Order::with('user')->latest()->take(10)->get();
+    return view('pos.index', compact('orders'));
+}
+    public function create()
     {
         $products = Product::with('inventory')->get();
-        return view('pos.index', compact('products'));
+        return view('pos.create', compact('products'));
     }
 
     public function search(Request $request)
