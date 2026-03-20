@@ -70,7 +70,7 @@ if errorlevel 1 (
 )
 
 echo [3/4] ⬇️ Pulling latest changes (with rebase)...
-git pull --rebase
+git pull --rebase origin main
 if errorlevel 1 (
     echo ❌ Pull failed. You may need to resolve conflicts manually.
     pause
@@ -78,7 +78,7 @@ if errorlevel 1 (
 )
 
 echo [4/4] ⬆️ Pushing to remote...
-git push
+git push origin main
 if errorlevel 1 (
     echo ❌ Push failed.
     pause
