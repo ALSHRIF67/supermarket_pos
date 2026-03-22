@@ -11,9 +11,15 @@ use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+ use App\Models\OrderItem;
+ use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class ProductController extends Controller
 {
+
+    use SoftDeletes;
     /**
      * Display a listing of the products.
      */
@@ -54,6 +60,40 @@ class ProductController extends Controller
     }
 
 
+/**
+ * Store a newly created product in storage.
+ */
+public function store(ProductStoreRequest $request)
+{
+    $validated = $request->validated();
+
+    // Handle image upload
+    if ($request->hasFile('product_image')) {
+        $imagePath = $request->file('product_image')->store('products', 'public');
+        $validated['product_image'] = $imagePath;
+    }
+
+    // Separate product and inventory data
+    $productData = \Illuminate\Support\Arr::except($validated, ['quantity', 'minimum_stock_alert', 'unit_type']);
+    $inventoryData = \Illuminate\Support\Arr::only($validated, ['quantity', 'minimum_stock_alert', 'unit_type']);
+
+    // Create product
+    $product = Product::create($productData);
+
+    // Create inventory record
+    $inventoryData['product_id'] = $product->id;
+    Inventory::create($inventoryData);
+
+    // Redirect based on action button (save or save_and_new)
+    $action = $request->input('action', 'save');
+    if ($action === 'save_and_new') {
+        return redirect()->route('products.create')
+            ->with('success', 'تم إضافة المنتج بنجاح. يمكنك إضافة منتج آخر.');
+    }
+
+    return redirect()->route('products.index')
+        ->with('success', 'تم إضافة المنتج بنجاح.');
+}
     public function edit(Product $product)
     {
         $product->load('inventory');
@@ -95,17 +135,26 @@ class ProductController extends Controller
         return redirect()->route('products.index')
             ->with('success', 'Product updated successfully.');
     }
-    public function destroy(Product $product)
-    {
-        // Delete image
-        if ($product->product_image) {
-            Storage::disk('public')->delete($product->product_image);
-        }
 
-        $product->delete();
 
+
+public function destroy(Product $product)
+{
+    // Check if product exists in any order items
+    if (OrderItem::where('product_id', $product->id)->exists()) {
         return redirect()->route('products.index')
-            ->with('success', 'Product deleted successfully.');
+            ->with('error', 'لا يمكن حذف هذا المنتج لأنه مرتبط بطلبات سابقة.');
     }
+
+    // Delete image if exists
+    if ($product->product_image) {
+        Storage::disk('public')->delete($product->product_image);
+    }
+
+    $product->delete();
+
+    return redirect()->route('products.index')
+        ->with('success', 'تم حذف المنتج بنجاح.');
+}
 }
 

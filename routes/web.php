@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\POSController;
 
+use App\Http\Controllers\Web\ExpenseController;
 
 Route::resource('products', ProductController::class);
 Route::resource('categories', CategoryController::class)->except(['show']);
@@ -34,5 +35,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pos/search', [PosController::class, 'search'])->name('pos.search');
     Route::post('/pos/order', [PosController::class, 'store'])->name('pos.store');
     Route::get('/pos/invoice/{order}', [PosController::class, 'invoice'])->name('pos.invoice');
+});
+
+
+
+Route::prefix('expenses')->group(function () {
+    Route::get('/', [ExpenseController::class, 'index'])->name('expenses.index');
+    Route::get('/create', [ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('/', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('/{id}', [ExpenseController::class, 'show'])->name('expenses.show');
+    Route::get('/{id}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::put('/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
 require __DIR__.'/auth.php';

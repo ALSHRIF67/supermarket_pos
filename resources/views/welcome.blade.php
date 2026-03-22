@@ -170,9 +170,5 @@
 
     {{-- Optional JS --}}
     @vite('resources/js/app.js')
-
-
-    <!-- Optional JS (leave as is) -->
-    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

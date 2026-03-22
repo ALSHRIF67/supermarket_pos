@@ -219,9 +219,6 @@
 <!-- Notification -->
 <div id="notification" class="notification"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const productsGrid = document.getElementById('productsGrid');
@@ -334,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('loadingOverlay').classList.remove('hidden');
 
-        axios.post('{{ route("pos.store") }}', data)
+        window.axios.post('{{ route("pos.store") }}', data)
             .then(res => {
                 document.getElementById('loadingOverlay').classList.add('hidden');
                 if (res.data.success) {
